@@ -4,7 +4,8 @@ import { connect } from 'react-redux'
 import { getLogin, getLogout } from '../redux/actions'
 // @ts-ignore
 import { NavLink } from 'react-router-dom'
-import { Button, Modal, Form, Input, Checkbox } from 'antd'
+import { Button, Modal, Form, Input, Checkbox, Dropdown, Menu, Space, MenuProps } from 'antd'
+import { DownOutlined, UserOutlined } from '@ant-design/icons';
 
 // @ts-ignore
 const Layout: FC<any> = ({children, ...props}) => {
@@ -33,8 +34,20 @@ const Layout: FC<any> = ({children, ...props}) => {
 
 	useEffect(()=>{
 		if(props.isLogin === true) setIsModalVisible(false);
-		console.log(props.isLogin, "props.isLogin")
+		if(props.errorLogin === true) setIsModalVisible(true);
+		else setIsModalVisible(false);
 	}, [props.isLogin])
+
+
+	const handleMenuClick: MenuProps['onClick'] = e => {
+		console.log('click', e);
+	};
+
+	const menu = (
+		<ul className="list-dropdown">
+			<li><Button onClick={props.onLogout}>Logout</Button></li>
+		</ul>
+	);
 
 	// @ts-ignore
 	return (
@@ -49,15 +62,24 @@ const Layout: FC<any> = ({children, ...props}) => {
 					<div className="navbar-nav">
 						<NavLink to={'/demo/1'} className="nav-item nav-link">Trang demo 1</NavLink>
 						<NavLink to={'/demo'} className="nav-item nav-link">Trang demo 2</NavLink>
-						{!props.isLogin && <a><Button onClick={showModal} type="primary">Login</Button></a>}
-						{props.isLogin && <a><Button onClick={props.onLogout} type="primary">{props.data && props.data.name}</Button></a>}
+						{!props.isLogin && <a className="btn-login"><Button onClick={showModal} type="primary">Login</Button></a>}
+						{props.isLogin && <a className="btn-login">
+							<Dropdown overlay={menu}>
+								<Button>
+									<Space>
+										{props.data && props.data.name}
+										<DownOutlined />
+									</Space>
+								</Button>
+							</Dropdown>
+						</a>}
 					</div>
 					<Modal title="Login" visible={isModalVisible} onOk={handleOk} onCancel={handleCancel} footer={null}>
 						<Form
 							name="basic"
 							labelCol={{ span: 4 }}
 							wrapperCol={{ span: 20 }}
-							initialValues={{ remember: true }}
+							initialValues={{ remember: false }}
 							onFinish={onFinish}
 							onFinishFailed={onFinishFailed}
 							autoComplete="off"
@@ -103,7 +125,8 @@ const Layout: FC<any> = ({children, ...props}) => {
 const mapStateToProps = (state: any) => {
 	return {
 		isLogin: state.reducerUser.isLogin,
-		data: state.reducerUser.data
+		data: state.reducerUser.data,
+		errorLogin: state.reducerUser.errorLogin
 	}
 }
 

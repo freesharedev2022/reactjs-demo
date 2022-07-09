@@ -6,7 +6,8 @@ const reducerUser = (state = {}, action: any) => {
     case GET_LOGOUT:
       return { ...state, loading: false, data: null, isLogin: false };
     case LOGIN_RECEIVED:
-      return { ...state,  data: action.data, isLogin: true, loading: false };
+      if(action.data.status === 200) return { ...state,  data: action.data, isLogin: true, errorLogin: false, loading: false };
+      else  return { ...state, isLogin: false, loading: false, errorLogin: true };
     default:
       return state;
   }
